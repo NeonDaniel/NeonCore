@@ -32,5 +32,5 @@ test_conf.json
 .pytest_cache/
 
 # Neon dev defaults
-./*.yml
-./.*.tmp
+ngi_*.yml
+.*.tmp
