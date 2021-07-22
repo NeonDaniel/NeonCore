@@ -28,6 +28,8 @@ import shutil
 import sys
 import unittest
 
+from mycroft_bus_client import MessageBusClient
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.util.skill_utils import *
 
@@ -44,7 +46,7 @@ SKILL_DIR = os.path.join(os.path.dirname(__file__), "test_skills")
 SKILL_CONFIG = {
     "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/neon-skills-submodules/dev/.utilities/"
                       "DEFAULT-SKILLS-DEV",
-    "neon_token": os.environ.get("GITHUB_TOKEN"),
+    "neon_token": "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",  # os.environ.get("GITHUB_TOKEN"),
     "directory": SKILL_DIR
 }
 
@@ -83,7 +85,17 @@ class SkillUtilsTests(unittest.TestCase):
     def test_install_skills_default(self):
         install_skills_default(SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
+        self.assertGreater(len(skill_dirs), 0)
         self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])))
+
+        from mycroft.skills.skill_loader import SkillLoader
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d)) and not
+                      d.startswith('.')]
+        for s in skill_dirs:
+            skill = SkillLoader(bus, os.path.join(SKILL_DIR, s)).load()
+            self.assertTrue(skill, s)
 
 
 if __name__ == '__main__':
