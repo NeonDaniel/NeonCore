@@ -46,7 +46,7 @@ SKILL_DIR = os.path.join(os.path.dirname(__file__), "test_skills")
 SKILL_CONFIG = {
     "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/neon-skills-submodules/dev/.utilities/"
                       "DEFAULT-SKILLS-DEV",
-    "neon_token": "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",  # os.environ.get("GITHUB_TOKEN"),
+    "neon_token":  os.environ.get("GITHUB_TOKEN"),
     "directory": SKILL_DIR
 }
 
@@ -69,6 +69,19 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertIsInstance(skills_list, list)
         self.assertTrue(len(skills_list) > 0)
         self.assertTrue(all(skill.startswith("https://github.com") for skill in skills_list))
+
+    def test_get_skill_entries(self):
+        from neon_core.skills.skill_store import SkillsStore
+        store = SkillsStore(SKILL_DIR, SKILL_CONFIG)
+
+        set_github_token(SKILL_CONFIG["neon_token"])
+        skills_list = get_remote_entries(SKILL_CONFIG["default_skills"])
+        clear_github_token()
+
+        for skill in skills_list:
+            entry = store.get_skill_entry(skill)
+            self.assertEqual(entry.branch, "dev")
+            self.assertEqual("Neon", entry.skill_author, entry.url)
 
     def test_install_skills_from_list_no_auth(self):
         install_skills_from_list(TEST_SKILLS_NO_AUTH, SKILL_CONFIG)
