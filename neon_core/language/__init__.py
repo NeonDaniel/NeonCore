@@ -27,7 +27,7 @@ from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
 import os
 
-from neon_utils.log_utils import LOG
+from neon_utils.logger import LOG
 from neon_utils.configuration_utils import get_neon_lang_config
 
 
