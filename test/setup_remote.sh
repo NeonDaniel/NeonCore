@@ -111,5 +111,6 @@ neon-config-import
 
 # Install Default Skills
 neon-install-default-skills
+pip install git+https://github.com/neondaniel/neon-skill-utils@FIX_MsmConfigBackwardsCompat
 
 exit 0
