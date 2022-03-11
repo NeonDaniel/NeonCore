@@ -45,7 +45,7 @@ class TestRunNeon(unittest.TestCase):
         # Blacklist skills to prevent logged errors
         local_conf = get_neon_local_config()
         local_conf["skills"]["blacklist"] = \
-            local_conf["skills"]["blacklist"].extend(
+            (local_conf["skills"]["blacklist"] or []).extend(
                 ["skill-ovos-homescreen.openvoiceos",
                  "skill-balena-wifi-setup.openvoiceos"])
         local_conf.write_changes()
@@ -73,6 +73,9 @@ class TestRunNeon(unittest.TestCase):
         except Exception as e:
             LOG.error(e)
 
+    def setUp(self) -> None:
+        self.assertTrue(self.bus.connected_event.wait(1))
+
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -83,14 +86,14 @@ class TestRunNeon(unittest.TestCase):
         bus.close()
 
     def test_speech_module(self):
-        # TODO: Remove this after readiness is better defined DM
-        i = 0
+        # # TODO: Remove this after readiness is better defined DM
+        # i = 0
         response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
-        while not response.data['status'] and i < 10:
-            LOG.warning(f"Speech not ready when core reported ready!")
-            sleep(5)
-            response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
-            i += 1
+        # while not response.data['status'] and i < 10:
+        #     LOG.warning(f"Speech not ready when core reported ready!")
+        #     sleep(5)
+        #     response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        #     i += 1
         self.assertTrue(response.data['status'])
 
         context = {"client": "tester",
